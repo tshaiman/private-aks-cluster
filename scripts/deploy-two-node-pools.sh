@@ -3,7 +3,7 @@
 # Variables
 
 # AKS cluster name
-aksPrefix="<YOUR-PREFIX->"
+aksPrefix="tsprv"
 aksName="${aksPrefix}Aks"
 validateTemplate=1
 useWhatIf=0
@@ -14,7 +14,7 @@ parameters="../templates/two-node-pools/azuredeploy.parameters.json"
 
 # Name and location of the resource group for the Azure Kubernetes Service (AKS) cluster
 aksResourceGroupName="${aksPrefix}RG"
-location="WestEurope"
+location="eastus"
 
 # Name and resource group name of the Azure Container Registry used by the AKS cluster.
 # The name of the cluster is also used to create or select an existing admin group in the Azure AD tenant.
@@ -23,9 +23,13 @@ acrResourceGroupName="$aksResourceGroupName"
 acrSku="Standard"
 
 # Subscription id, subscription name, and tenant id of the current subscription
-subscriptionId=$(az account show --query id --output tsv)
-subscriptionName=$(az account show --query name --output tsv)
-tenantId=$(az account show --query tenantId --output tsv)
+azAccountInfo=$(az account show)
+subscriptionId=$(echo $azAccountInfo | jq -r '.id')
+subscriptionName=$(echo $azAccountInfo | jq -r '.name')
+tenantId=$(echo $azAccountInfo | jq -r '.tenantId')
+userPrincipalName=$(echo $azAccountInfo | jq -r '.user.name')
+
+echo "Running with Subscription $subscriptionName ($subscriptionId) in Tenant $tenantId"
 
 # Install aks-preview Azure extension
 echo "Checking if [aks-preview] extension is already installed..."
@@ -51,37 +55,11 @@ else
     fi
 fi
 
-# Registering AKS feature extensions
-aksExtensions=("EnableAzureRBACPreview" "UserAssignedIdentityPreview")
-ok=0
-for aksExtension in ${aksExtensions[@]}; do
-    echo "Checking if [$aksExtension] extension is already registered..."
-    extension=$(az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/$aksExtension') && @.properties.state == 'Registered'].{Name:name}" --output tsv)
-    if [[ -z $extension ]]; then
-        echo "[$aksExtension] extension is not registered."
-        echo "Registering [$aksExtension] extension..."
-        az feature register --name $aksExtension --namespace Microsoft.ContainerService
-        ok=1
-    else
-        echo "[$aksExtension] extension is already registered."
-    fi
-done
 
-if [[ $ok == 1 ]]; then
-    echo "Refreshing the registration of the Microsoft.ContainerService resource provider..."
-    az provider register --namespace Microsoft.ContainerService
-    echo "Microsoft.ContainerService resource provider registration successfully refreshed"
-fi
 
 # Get the last Kubernetes version available in the region
-kubernetesVersion=$(az aks get-versions --location $location --query "orchestrators[?isPreview==false].orchestratorVersion | sort(@) | [-1]" --output tsv)
 
-if [[ -n $kubernetesVersion ]]; then
-    echo "Successfully retrieved the last Kubernetes version [$kubernetesVersion] supported by AKS in [$location] Azure region"
-else
-    echo "Failed to retrieve the last Kubernetes version supported by AKS in [$location] Azure region"
-    exit
-fi
+kubernetesVersion="1.26.3"
 
 # Check if the resource group already exists
 echo "Checking if [$aksResourceGroupName] resource group actually exists in the [$subscriptionName] subscription..."
@@ -252,7 +230,6 @@ fi
 
 # Get the user principal name of the current user
 echo "Retrieving the user principal name of the current user from the [$tenantId] Azure AD tenant..."
-userPrincipalName=$(az account show --query user.name --output tsv)
 if [[ -n $userPrincipalName ]]; then
     echo "[$userPrincipalName] user principal name successfully retrieved from the [$tenantId] Azure AD tenant"
 else

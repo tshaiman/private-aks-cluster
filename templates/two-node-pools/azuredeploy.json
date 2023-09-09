@@ -1278,7 +1278,7 @@
     },
     {
       "type": "Microsoft.ContainerService/managedClusters",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2023-05-02-preview",
       "name": "[parameters('aksClusterName')]",
       "location": "[parameters('location')]",
       "identity": {
@@ -1444,7 +1444,7 @@
     },
     {
       "type": "Microsoft.Network/privateDnsZones",
-      "apiVersion": "2018-09-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('blobPrivateDnsZoneName')]",
       "location": "global",
       "properties": {
@@ -1456,7 +1456,7 @@
     {
       "condition": "[equals(parameters('acrSku'), 'Premium')]",
       "type": "Microsoft.Network/privateDnsZones",
-      "apiVersion": "2018-09-01",
+      "apiVersion": "2020-06-01",
       "name": "[variables('acrPrivateDnsZoneName')]",
       "location": "global",
       "properties": {
@@ -1467,7 +1467,7 @@
     },
     {
       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-      "apiVersion": "2018-09-01",
+      "apiVersion": "2020-06-01",
       "name": "[concat(variables('blobPrivateDnsZoneName'), '/link_to_', toLower(parameters('virtualNetworkName')))]",
       "location": "global",
       "dependsOn": [
@@ -1484,7 +1484,7 @@
     {
       "condition": "[equals(parameters('acrSku'), 'Premium')]",
       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-      "apiVersion": "2018-09-01",
+      "apiVersion": "2020-06-01",
       "name": "[concat(variables('acrPrivateDnsZoneName'), '/link_to_', toLower(parameters('virtualNetworkName')))]",
       "location": "global",
       "dependsOn": [

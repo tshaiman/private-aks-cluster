@@ -24,7 +24,7 @@
       "value": "loadBalancer"
     },
     "aksClusterKubernetesVersion": {
-      "value": "1.19.3"
+      "value": "1.26.3"
     },
     "aksClusterAdminUsername": {
       "value": "azadmin"
@@ -50,13 +50,13 @@
       "value": "Standard_DS3_v2"
     },
     "systemNodePoolAgentCount": {
-      "value": 3
+      "value": 2
     },
     "systemNodePoolMaxCount": {
       "value": 5
     },
     "systemNodePoolMinCount": {
-      "value": 3
+      "value": 2
     },
     "systemNodePoolNodeTaints": {
       "value": [
@@ -70,13 +70,13 @@
       "value": "Standard_DS3_v2"
     },
     "userNodePoolAgentCount": {
-      "value": 3
+      "value": 2
     },
     "userNodePoolMaxCount": {
       "value": 5
     },
     "userNodePoolMinCount": {
-      "value": 3
+      "value": 2
     },
     "virtualNetworkAddressPrefixes": {
       "value": "10.0.0.0/8"
